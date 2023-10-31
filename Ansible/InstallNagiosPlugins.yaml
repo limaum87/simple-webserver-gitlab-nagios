@@ -1,0 +1,33 @@
+- hosts: all
+  become: true
+  tasks:
+    - name: Instalando NRPE Server
+      apt:
+        name: nagios-nrpe-server
+        state: latest
+        update_cache: true
+    - name: Instalando Nagios Plugins
+      apt:
+        name: nagios-nrpe-plugin
+        state: latest
+        update_cache: false
+    - name: Alterando o host nagios
+      lineinfile: 
+        path: /etc/nagios/nrpe.cfg
+        regexp: '^(.*)allowed_hosts=(.*)$' 
+        line: 'allowed_hosts=127.0.0.1,{{ external_ip }}'
+        backrefs: yes
+    - name: Incluindo o plugin de memória
+      lineinfile:
+        path: /etc/nagios/nrpe.cfg
+        line: 'command[check_mem]=/usr/lib/nagios/plugins/check_mem.sh  -w 80 -c 90'
+        insertafter: check_zombie_procs.*
+    - name: Download Script de memoria
+      ansible.builtin.get_url:
+        url: http://accept.dyn.accept.inf.br:8080/nagios/check_mem.sh
+        dest: /usr/lib/nagios/plugins/check_mem.sh
+        mode: '0777'
+    - name: Inicia o servico NRPE
+      ansible.builtin.service:
+        name: nagios-nrpe-server 
+        state: reloaded

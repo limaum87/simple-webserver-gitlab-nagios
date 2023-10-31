@@ -1,0 +1,37 @@
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Instalando Pre requisitos
+      apt: name={{ item }} update_cache=yes state=latest force_apt_get=yes
+      loop: [ 'aptitude','apt-transport-https','ca-certificates','curl','software-properties-common','git','python3','pip' ]
+
+    - name: Adicionando Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Adicionando Repositorio Docker
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu jammy stable
+        state: present
+
+    - name: Instalando Docker
+      apt:
+        name: docker-ce
+        state: latest
+        update_cache: true
+
+    - name: Instalando Modulo Docker para Python
+      pip:
+        name: docker
+
+    - name: Instalando docker-compose-plugin
+      apt:
+        name: docker-compose-plugin 
+        state: latest
+
+    - name: Instalando docker-compose
+      apt:
+        name: docker-compose 
+        state: latest
