@@ -5,7 +5,7 @@ provider "aws" {
 
 resource "aws_key_pair" "keypair" {
   key_name   = "machine-key"  # Name of ec2 keypair
-  public_key = file("~/.ssh/id_rsa.pub")  # Filepath of the key
+  public_key = file("~/.ssh/id_rsa.pub")  # Filepath of your ssh-key
 }
 
 resource "aws_instance" "project-server" {
@@ -19,9 +19,9 @@ resource "aws_instance" "project-server" {
   vpc_security_group_ids = [aws_security_group.sg_webserver.id]
 
   root_block_device {
-    volume_type           = "gp2"  // Tipo de volume EBS (por exemplo, gp2 para SSD)
-    volume_size           = 20     // Tamanho do volume raiz em GB
-    delete_on_termination = true  // O volume será excluído quando a instância for terminada
+    volume_type           = "gp2"  
+    volume_size           = 20     
+    delete_on_termination = true  
   }
 
 

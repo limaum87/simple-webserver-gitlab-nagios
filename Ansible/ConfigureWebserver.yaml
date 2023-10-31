@@ -1,0 +1,25 @@
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Copiar arquivos docker compose
+      copy:
+        src: ../Docker/
+        dest: /root/
+
+    - name: Iniciar dockers da pasta Containers
+      docker_compose:
+        project_src: /root/containers
+        files:
+        - docker-compose.yml
+    - name: Iniciar dockers da pasta Proxy
+      docker_compose:
+        project_src: /root/proxy
+        files:
+        - docker-compose.yml
+    - name: Abrir porta do docker
+      ufw:
+        rule: allow
+        port: '8088'
+        proto: tcp
+    
