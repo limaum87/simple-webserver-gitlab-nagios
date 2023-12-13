@@ -1,6 +1,6 @@
 - hosts: all
   become: true
-
+  
   tasks:
     - name: Instalando Pre requisitos
       apt: name={{ item }} update_cache=yes state=latest force_apt_get=yes
@@ -35,3 +35,7 @@
       apt:
         name: docker-compose 
         state: latest
+
+   
+
+

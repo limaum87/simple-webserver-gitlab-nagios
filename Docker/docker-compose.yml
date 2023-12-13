@@ -2,13 +2,13 @@ services:
   webserver-db:
     image: mysql:5.7.38-debian
     container_name: webserver-db
-    command: --default-authentication-plugin=mysql_native_password
+    command: --default-authentication-plugin=mysql_native_password --sql_mode=""
     restart: always
     env_file:
       - .env
     volumes:
       - ./database:/var/lib/mysql
-    command: --sql_mode=""
+
   webserver-http:
     image: webdevops/php-apache:alpine-php7
     container_name: webserver-http
@@ -16,6 +16,7 @@ services:
       - "80"
     volumes:
       - ./www/site:/app
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: webserver-phpmyadmin
@@ -23,16 +24,27 @@ services:
       - .env
     expose:
       - "80"
+
   webserver-nginx:
-    container_name: acc-nginx
+    container_name: webserver-nginx
     restart: unless-stopped
     image: nginx
     ports:
         - 80:80
         - 443:443
     volumes:
-        - ../proxy/default.conf:/etc/nginx/nginx.conf
-        - ../proxy/includes/proxy.conf:/etc/nginx/includes/proxy.conf
+        - ./proxy/default.conf:/etc/nginx/nginx.conf
+        - ./proxy/includes/proxy.conf:/etc/nginx/includes/proxy.conf
 
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    container_name: gitlab-runner
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./gitlab/config.toml:/etc/gitlab-runner/config.toml
+      - ./www/site:/site
+
+  
 
 

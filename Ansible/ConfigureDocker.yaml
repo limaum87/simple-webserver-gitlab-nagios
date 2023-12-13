@@ -1,0 +1,36 @@
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Cria o grupo docker
+      group:
+        name: docker
+        state: present
+
+    - name: Adiciona o usuário 'accept' ao grupo docker
+      user:
+        name: accept
+        groups: docker
+        append: yes
+
+    - name: Copiar arquivos docker compose
+      copy:
+        src: ../Docker/
+        dest: /home/accept/docker
+
+    - name: Executar docker-compose pull
+      command: >
+        docker compose -f /home/accept/docker/docker-compose.yml pull
+     
+    - name: Executar docker-compose up -d
+      command: >
+        docker compose -f /home/accept/docker/docker-compose.yml up -d
+     
+   
+
+    - name: Abrir porta do docker
+      ufw:
+        rule: allow
+        port: '80'
+        proto: tcp
+
